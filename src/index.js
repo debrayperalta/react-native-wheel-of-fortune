@@ -12,8 +12,7 @@ import * as d3Shape from "d3-shape";
 
 import Svg, {
   G,
-  TSpan,
-  TextPath,
+  Text as SVGText,
   Path,
   Image,
   Circle,
@@ -24,6 +23,15 @@ const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 
 const { width, height } = Dimensions.get("screen");
 
+const colors = [
+  "#0000FF",
+  "#008000",
+  "#FF8000",
+  "#800080",
+  "#01A9DB",
+  "#848484",
+];
+
 class WheelOfFortune extends Component {
   constructor(props) {
     super(props);
@@ -31,16 +39,21 @@ class WheelOfFortune extends Component {
     this.width = this.props.size ? this.props.size : width;
     this.height = this.props.size ? this.props.size : height;
 
+    this.Rewards = this.props.rewards;
+    this.RewardCount = this.Rewards.length;
+    const rewardsColors = this.Rewards.map((r) => {
+      const fillColor = colors[Math.floor(Math.random() * colors.length)];
+      return fillColor;
+    });
+
     this.state = {
       enabled: false,
       started: false,
       finished: false,
       winner: null,
       wheelOpacity: new Animated.Value(1),
+      rewardsColors: rewardsColors,
     };
-
-    this.Rewards = this.props.rewards;
-    this.RewardCount = this.Rewards.length;
 
     this.numberOfSegments = this.RewardCount;
     this.fontSize = props.fontSize || 20;
@@ -163,19 +176,26 @@ class WheelOfFortune extends Component {
     </Svg>
   );
 
-  _textRender = (x, y, value, size, i, rotation) => (
-    <Svg height="70" width="70">
-      <TSpan
-        x={x - size / 3}
-        y={y - size / 7}
-        textAnchor="start"
-        fontWeight="bold"
-        fill="white"
-      >
-        {value}
-      </TSpan>
-    </Svg>
-  );
+  _textRender = (x, y, value, size, i, rotation) => {
+    const { rewardsColors } = this.state;
+    const fillColor = rewardsColors[i];
+    return (
+      <Svg height="70" width="70">
+        <Circle stroke="#2162cc" fill={fillColor} x={x} y={y} r={size / 2} />
+        <SVGText
+          stroke="white"
+          fontSize="16"
+          x={x - size / 5096}
+          y={y - size / 2048}
+          textAnchor="middle"
+          fontWeight="bold"
+          fill="white"
+        >
+          {value[0].toUpperCase()}
+        </SVGText>
+      </Svg>
+    );
+  };
 
   _renderSvgWheel = () => {
     return (
