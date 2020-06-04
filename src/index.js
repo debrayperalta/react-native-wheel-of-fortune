@@ -23,14 +23,10 @@ const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 
 const { width, height } = Dimensions.get("screen");
 
-const colors = [
-  "#0000FF",
-  "#008000",
-  "#FF8000",
-  "#800080",
-  "#01A9DB",
-  "#848484",
-];
+const colors = {
+  "#73A4D0": "#4C7CBE",
+  "#4C7CBE": "#73A4D0",
+};
 
 class WheelOfFortune extends Component {
   constructor(props) {
@@ -41,10 +37,6 @@ class WheelOfFortune extends Component {
 
     this.Rewards = this.props.rewards;
     this.RewardCount = this.Rewards.length;
-    const rewardsColors = this.Rewards.map((r) => {
-      const fillColor = colors[Math.floor(Math.random() * colors.length)];
-      return fillColor;
-    });
 
     this.state = {
       enabled: false,
@@ -52,7 +44,6 @@ class WheelOfFortune extends Component {
       finished: false,
       winner: null,
       wheelOpacity: new Animated.Value(1),
-      rewardsColors: rewardsColors,
     };
 
     this.numberOfSegments = this.RewardCount;
@@ -176,17 +167,16 @@ class WheelOfFortune extends Component {
     </Svg>
   );
 
-  _textRender = (x, y, value, size, i, rotation) => {
-    const { rewardsColors } = this.state;
-    const fillColor = rewardsColors[i];
+  _textRender = (x, y, value, size, i, arcColor) => {
+    const fillColor = colors[arcColor];
     return (
       <Svg height="70" width="70">
-        <Circle stroke="#2162cc" fill={fillColor} x={x} y={y} r={size / 2} />
+        <Circle stroke={fillColor} fill={fillColor} x={x} y={y} r={size / 2} />
         <SVGText
           stroke="white"
-          fontSize="16"
+          fontSize="30"
           x={x - size / 5096}
-          y={y - size / 2048}
+          y={y + 10 - size / 2048}
           textAnchor="middle"
           fontWeight="bold"
           fill="white"
@@ -260,15 +250,7 @@ class WheelOfFortune extends Component {
                     >
                       {typeof arc.value === "object"
                         ? this._imageRender(x, y, arc.value, 60)
-                        : this._textRender(
-                            x,
-                            y,
-                            arc.value,
-                            60,
-                            i,
-                            (i * this.oneTurn) / this.numberOfSegments +
-                              this.angleOffset
-                          )}
+                        : this._textRender(x, y, arc.value, 60, i, arc.color)}
                     </G>
                   </G>
                 );
